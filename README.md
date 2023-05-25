@@ -1,4 +1,4 @@
-# pdris_2_semester
+# Task 1. Istio + Egress + Ingress
 В кластере используется два сервиса - nginx и jokeservice.
 
 nginx перенаправляет внутренний трафик.

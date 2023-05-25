@@ -13,3 +13,4 @@ jokeservice ходит на внешнюю ручку https://geek-jokes.sameerk
 1. Запустить скрипт run.sh, не закрывать заблокированный терминал.
 2. В другом терминале запустить скрипт kubectl get svc -n istio-system istio-ingressgateway, посмотреть External Ip сервиса
 3. Открыть в браузере вкладку http://$x/joke, где x - External Ip сервиса
+4. В браузере отобразится случайная шутка

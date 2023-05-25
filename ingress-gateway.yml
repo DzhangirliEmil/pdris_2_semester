@@ -1,0 +1,28 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: joke-service-gateway
+spec:
+  selector:
+    app: istio-ingressgateway
+  servers:
+    - port:
+        number: 80
+        name: http
+        protocol: HTTP
+      hosts:
+        - "*"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: joke-service-ingress
+spec:
+  hosts:
+    - "*"
+  gateways:
+    - joke-service-gateway
+  http:
+    - route:
+        - destination:
+            host: nginx-cip

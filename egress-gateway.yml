@@ -1,0 +1,64 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: jokeapi-egressgateway
+spec:
+  selector:
+    app: istio-egressgateway
+  servers:
+    - port:
+        number: 443
+        name: tls
+        protocol: TLS
+      hosts:
+        - jokeapi.co
+      tls:
+        mode: PASSTHROUGH
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: jokeapi
+spec:
+  hosts:
+    - jokeapi.co
+  ports:
+    - number: 443
+      name: tls
+      protocol: TLS
+  resolution: DNS
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: jokeapi-through-egress-gateway
+spec:
+  hosts:
+    - jokeapi.co
+  gateways:
+    - mesh
+    - jokeapi-egressgateway
+  tls:
+    - match:
+        - gateways:
+            - mesh
+          port: 443
+          sniHosts:
+            - jokeapi.co
+      route:
+        - destination:
+            host: istio-egressgateway.istio-system.svc.cluster.local
+            port:
+              number: 443
+    - match:
+        - gateways:
+            - jokeapi-egressgateway
+          port: 443
+          sniHosts:
+            - jokeapi.co
+      route:
+        - destination:
+            host: jokeapi.co
+            port:
+              number: 443
+          weight: 100

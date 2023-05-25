@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: joke-service-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: joke-service
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      name: joke-service-pod
+      labels:
+        app: joke-service
+    spec:
+      containers:
+        - image: demiproger/jokeservice
+          name: joke-service-container
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: config
+              mountPath: /app/.env
+              subPath: .env
+              readOnly: true
+      volumes:
+        - name: config
+          configMap:
+            name: joke-service-cm
+            items:
+              - key: .env
+                path: .env
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: joke-service-cip
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 8080
+  selector:
+    app: joke-service
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: joke-service-cm
+  namespace: default
+data:
+  .env: |-
+    HOST=""
+    PORT=8080
